@@ -24,6 +24,11 @@ const ActivityDetails: React.FC<IProps> = ({
         <Card.Header>{activity?.title}</Card.Header>
         <Card.Meta>
           <span className="date">{activity?.date}</span>
+          {activity?.city && activity?.venue ? (
+            <div>
+              {activity?.city}, {activity?.venue}
+            </div>
+          ) : null}
         </Card.Meta>
         <Card.Description>{activity?.description}</Card.Description>
       </Card.Content>

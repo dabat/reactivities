@@ -8,6 +8,7 @@ interface iProps {
   activity: IActivity | null;
   activityCreate: (activity: IActivity) => void;
   activityEdit: (activity: IActivity) => void;
+  submitting: boolean;
 }
 
 const ActivityForm: React.FC<iProps> = ({
@@ -15,6 +16,7 @@ const ActivityForm: React.FC<iProps> = ({
   activity: initialActivity,
   activityCreate,
   activityEdit,
+  submitting,
 }) => {
   const initializeForm = () => {
     if (initialActivity) {
@@ -47,13 +49,10 @@ const ActivityForm: React.FC<iProps> = ({
         ...activity,
         id: uuid(),
       };
-      console.log(newActivity);
       activityCreate(newActivity);
     } else {
       activityEdit(activity);
     }
-
-    console.log(activity); //TODO connect api
   };
 
   return (
@@ -97,7 +96,13 @@ const ActivityForm: React.FC<iProps> = ({
           value={activity.venue}
           onChange={handleInputChange}
         />
-        <Button floated="right" positive type="submit" content="Save" />
+        <Button
+          floated="right"
+          positive
+          type="submit"
+          content="Save"
+          loading={submitting}
+        />
         <Button
           floated="right"
           type="submit"
