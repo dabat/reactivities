@@ -33,7 +33,7 @@ const requests = {
   delete: (url: string) => axios.delete(url).then(sleep()).then(responseBody),
 };
 
-const activities = {
+const Activities = {
   list: (): Promise<IActivity[]> => requests.get("/activities"),
   details: (id: string): Promise<IActivity> =>
     requests.get(`/activities/${id}`),
@@ -43,4 +43,4 @@ const activities = {
   delete: (id: string) => requests.delete(`/activities/${id}`),
 };
 
-export default { activities };
+export default { Activities };

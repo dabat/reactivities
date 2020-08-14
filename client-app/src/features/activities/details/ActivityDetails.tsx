@@ -1,18 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Card, Image, Button } from "semantic-ui-react";
-import { IActivity } from "../../../app/models/activity";
+import ActivityStore from "../../../app/stores/activityStore";
+import { observer } from "mobx-react-lite";
 
-interface IProps {
-  activity: IActivity | null;
-  setEditMode: (editMode: boolean) => void;
-  setSelectedActivity: (activity: IActivity | null) => void;
-}
-
-const ActivityDetails: React.FC<IProps> = ({
-  activity,
-  setEditMode,
-  setSelectedActivity,
-}) => {
+const ActivityDetails: React.FC = () => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    selectedActivity: activity,
+    editFormOpen,
+    editFormClose,
+  } = activityStore;
   return (
     <Card fluid>
       <Image
@@ -24,9 +21,15 @@ const ActivityDetails: React.FC<IProps> = ({
         <Card.Header>{activity?.title}</Card.Header>
         <Card.Meta>
           <span className="date">{activity?.date}</span>
+          {activity?.city && !activity?.venue ? (
+            <div>{activity?.city}</div>
+          ) : null}
+          {!activity?.city && activity?.venue ? (
+            <div>@ {activity?.venue}</div>
+          ) : null}
           {activity?.city && activity?.venue ? (
             <div>
-              {activity?.city}, {activity?.venue}
+              {activity?.city} @ {activity?.venue}
             </div>
           ) : null}
         </Card.Meta>
@@ -38,13 +41,13 @@ const ActivityDetails: React.FC<IProps> = ({
             basic
             color="blue"
             content="Edit"
-            onClick={() => setEditMode(true)}
+            onClick={() => editFormOpen(activity)}
           />
           <Button
             basic
             color="grey"
             content="Close"
-            onClick={() => setSelectedActivity(null)}
+            onClick={() => editFormClose()}
           />
         </Button.Group>
       </Card.Content>
@@ -52,4 +55,4 @@ const ActivityDetails: React.FC<IProps> = ({
   );
 };
 
-export default ActivityDetails;
+export default observer(ActivityDetails);

@@ -1,26 +1,24 @@
-import React, { SyntheticEvent } from "react";
+import React, { SyntheticEvent, useContext } from "react";
 import { Item, Button, Label, Segment } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import { observer } from "mobx-react-lite";
+import ActivityStore from "../../../app/stores/activityStore";
 
 interface IProps {
-  activities: IActivity[];
-  selectActivity: (id: string) => void;
   activityDelete: (
     event: SyntheticEvent<HTMLButtonElement>,
     activity: IActivity
   ) => void;
-  submitting: boolean;
   target: string;
 }
 
-const ActivityList: React.FC<IProps> = ({
-  activities,
-  selectActivity,
-  activityDelete,
-  submitting,
-  target,
-}) => {
+const ActivityList: React.FC<IProps> = ({ activityDelete, target }) => {
+  const activityStore = useContext(ActivityStore);
+  const {
+    activitiesByDate: activities,
+    activitySelect,
+    submitting,
+  } = activityStore;
   if (!activities.length) {
     return <p>Oh no! ...there are no activities to show. Please create one!</p>;
   } else {
@@ -35,19 +33,29 @@ const ActivityList: React.FC<IProps> = ({
               />
               <Item.Content>
                 <Item.Header as="a">{activity.title}</Item.Header>
-                <Item.Meta>{activity.date}</Item.Meta>
+                <Item.Meta>
+                  {activity.date}
+                  {activity?.city && !activity?.venue ? (
+                    <div>{activity?.city}</div>
+                  ) : null}
+                  {!activity?.city && activity?.venue ? (
+                    <div>@ {activity?.venue}</div>
+                  ) : null}
+                  {activity?.city && activity?.venue ? (
+                    <div>
+                      {activity?.city} @ {activity?.venue}
+                    </div>
+                  ) : null}
+                </Item.Meta>
                 <Item.Description>
                   <div>{activity.description}</div>
-                  <div>
-                    {activity.city}, {activity.venue}
-                  </div>
                 </Item.Description>
                 <Item.Extra>
                   <Button
                     floated="right"
                     content="View"
                     color="blue"
-                    onClick={() => selectActivity(activity.id)}
+                    onClick={() => activitySelect(activity.id)}
                   />
                   <Button
                     name={activity.id}
