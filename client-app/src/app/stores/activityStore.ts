@@ -7,10 +7,9 @@ configure({ enforceActions: "always" });
 
 class ActivityStore {
   @observable activityRegistry = new Map();
-  @observable activities: IActivity[] = [];
-  @observable editMode = false;
-  @observable loadingInitial = false;
+  @observable activitiesLoading = false;
   @observable selectedActivity: IActivity | null = null;
+  @observable editMode = false;
   @observable submitting = false;
   @observable target = "";
 
@@ -22,7 +21,7 @@ class ActivityStore {
 
   @action activitiesLoad = async () => {
     try {
-      this.loadingInitial = true;
+      this.activitiesLoading = true;
       const activities = await agent.Activities.list();
       runInAction("activitiesLoad-try", () => {
         activities.forEach((activity) => {
@@ -34,7 +33,7 @@ class ActivityStore {
       console.log(error); //TODO log errors somewhere
     } finally {
       runInAction("activitiesLoad-finally", () => {
-        this.loadingInitial = false;
+        this.activitiesLoading = false;
       });
     }
   };

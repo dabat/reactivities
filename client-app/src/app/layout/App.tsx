@@ -13,7 +13,7 @@ const App = () => {
     activityStore.activitiesLoad();
   }, [activityStore]);
 
-  if (activityStore.loadingInitial)
+  if (activityStore.activitiesLoading)
     return (
       <LoadingComponent inverted={true} content="Fetching activities ..." />
     );
