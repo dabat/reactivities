@@ -1,26 +1,19 @@
-import React, { SyntheticEvent, useContext } from "react";
+import React, { useContext } from "react";
 import { Item, Button, Label, Segment } from "semantic-ui-react";
-import { IActivity } from "../../../app/models/activity";
 import { observer } from "mobx-react-lite";
 import ActivityStore from "../../../app/stores/activityStore";
 
-interface IProps {
-  activityDelete: (
-    event: SyntheticEvent<HTMLButtonElement>,
-    activity: IActivity
-  ) => void;
-  target: string;
-}
-
-const ActivityList: React.FC<IProps> = ({ activityDelete, target }) => {
+const ActivityList: React.FC = () => {
   const activityStore = useContext(ActivityStore);
   const {
     activitiesByDate: activities,
     activitySelect,
     submitting,
+    target,
+    activityDelete,
   } = activityStore;
   if (!activities.length) {
-    return <p>Oh no! ...there are no activities to show. Please create one!</p>;
+    return <p>Oh no! ...there are no activities to show. 😢</p>;
   } else {
     return (
       <Segment clearing>
@@ -62,7 +55,7 @@ const ActivityList: React.FC<IProps> = ({ activityDelete, target }) => {
                     floated="right"
                     content="Delete"
                     color="red"
-                    onClick={(event) => activityDelete(event, activity)}
+                    onClick={(event) => activityDelete(activity.id, event)}
                     loading={target === activity.id && submitting}
                   />
                   <Label basic content={activity.category} />

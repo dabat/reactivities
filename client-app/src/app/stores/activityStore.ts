@@ -1,7 +1,9 @@
-import { observable, action, computed } from "mobx";
-import { createContext } from "react";
+import { observable, action, computed, configure, runInAction } from "mobx";
+import { createContext, SyntheticEvent } from "react";
 import { IActivity } from "../models/activity";
 import agent from "../api/agent";
+
+configure({ enforceActions: "always" });
 
 class ActivityStore {
   @observable activityRegistry = new Map();
@@ -10,6 +12,7 @@ class ActivityStore {
   @observable loadingInitial = false;
   @observable selectedActivity: IActivity | null = null;
   @observable submitting = false;
+  @observable target = "";
 
   @computed get activitiesByDate() {
     return Array.from(this.activityRegistry.values()).sort(
@@ -21,14 +24,18 @@ class ActivityStore {
     try {
       this.loadingInitial = true;
       const activities = await agent.Activities.list();
-      activities.forEach((activity) => {
-        activity.date = activity.date.split(".")[0];
-        this.activityRegistry.set(activity.id, activity);
+      runInAction("activitiesLoad-try", () => {
+        activities.forEach((activity) => {
+          activity.date = activity.date.split(".")[0];
+          this.activityRegistry.set(activity.id, activity);
+        });
       });
     } catch (error) {
       console.log(error); //TODO log errors somewhere
     } finally {
-      this.loadingInitial = false;
+      runInAction("activitiesLoad-finally", () => {
+        this.loadingInitial = false;
+      });
     }
   };
 
@@ -36,13 +43,17 @@ class ActivityStore {
     try {
       this.submitting = true;
       await agent.Activities.create(activity);
-      this.activityRegistry.set(activity.id, activity);
-      this.activitySelect(activity.id);
-      this.editMode = false;
+      runInAction("activityCreate-try", () => {
+        this.activityRegistry.set(activity.id, activity);
+        this.activitySelect(activity.id);
+        this.editMode = false;
+      });
     } catch (error) {
       console.log(error); //TODO log errors somewhere
     } finally {
-      this.submitting = false;
+      runInAction("activityCreate-finally", () => {
+        this.submitting = false;
+      });
     }
   };
 
@@ -55,12 +66,37 @@ class ActivityStore {
     try {
       this.submitting = true;
       await agent.Activities.update(activity);
-      this.activityRegistry.set(activity.id, activity);
-      this.activitySelect(activity.id);
+      runInAction("activityUpdate-try", () => {
+        this.activityRegistry.set(activity.id, activity);
+        this.activitySelect(activity.id);
+      });
     } catch (error) {
       console.log(error); //TODO log error somewhere
     } finally {
-      this.submitting = false;
+      runInAction("activityUpdate-finally", () => {
+        this.submitting = false;
+      });
+    }
+  };
+
+  @action activityDelete = async (
+    id: string,
+    event: SyntheticEvent<HTMLButtonElement>
+  ) => {
+    try {
+      this.target = event.currentTarget.name;
+      this.submitting = true;
+      await agent.Activities.delete(id);
+      runInAction("activityDelete-try", () => {
+        this.activityRegistry.delete(id);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      runInAction("activityDelete-finally", () => {
+        this.target = "";
+        this.submitting = false;
+      });
     }
   };
 
@@ -76,6 +112,10 @@ class ActivityStore {
 
   @action editFormClose = () => {
     this.editMode = false;
+  };
+
+  @action detailsFormClose = () => {
+    this.activitySelect("");
   };
 }
 

@@ -8,7 +8,7 @@ const ActivityDetails: React.FC = () => {
   const {
     selectedActivity: activity,
     editFormOpen,
-    editFormClose,
+    detailsFormClose,
   } = activityStore;
   return (
     <Card fluid>
@@ -47,7 +47,7 @@ const ActivityDetails: React.FC = () => {
             basic
             color="grey"
             content="Close"
-            onClick={() => editFormClose()}
+            onClick={() => detailsFormClose()}
           />
         </Button.Group>
       </Card.Content>
