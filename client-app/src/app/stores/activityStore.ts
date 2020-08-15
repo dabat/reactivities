@@ -8,7 +8,7 @@ configure({ enforceActions: "always" });
 class ActivityStore {
   @observable activityRegistry = new Map();
   @observable activitiesLoading = false;
-  @observable selectedActivity: IActivity | null = null;
+  @observable activity: IActivity | null = null;
   @observable editMode = false;
   @observable submitting = false;
   @observable target = "";
@@ -56,9 +56,24 @@ class ActivityStore {
     }
   };
 
-  @action activitySelect = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id) || null;
-    this.editMode = false;
+  @action activitySelect = async (id: string) => {
+    this.activity = this.activityRegistry.get(id) || null;
+    if (!this.activity) {
+      try {
+        this.activitiesLoading = true;
+        this.activity = await agent.Activities.details(id);
+        if (!this.activity) {
+          throw new Error(`An activity with id ${id} was not found`);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        runInAction(() => {
+          this.activitiesLoading = false;
+          this.editMode = false;
+        });
+      }
+    }
   };
 
   @action activityUpdate = async (activity: IActivity) => {
@@ -111,10 +126,6 @@ class ActivityStore {
 
   @action editFormClose = () => {
     this.editMode = false;
-  };
-
-  @action detailsFormClose = () => {
-    this.activitySelect("");
   };
 }
 

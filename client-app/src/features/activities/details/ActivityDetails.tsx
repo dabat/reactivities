@@ -1,17 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Card, Image, Button } from "semantic-ui-react";
 import ActivityStore from "../../../app/stores/activityStore";
 import { observer } from "mobx-react-lite";
+import { RouteComponentProps, Link } from "react-router-dom";
 
-const ActivityDetails: React.FC = () => {
+interface iDetailParams {
+  id: string;
+}
+
+const ActivityDetails: React.FC<RouteComponentProps<iDetailParams>> = ({
+  match,
+}) => {
   const activityStore = useContext(ActivityStore);
-  const {
-    selectedActivity: activity,
-    editFormOpen,
-    detailsFormClose,
-  } = activityStore;
+  const { activity, activitySelect, editFormOpen } = activityStore;
+
+  useEffect(() => {
+    activitySelect(match.params.id);
+  }, [activitySelect]);
+
   return (
-    <Card fluid>
+    <Card>
       <Image
         src={`/assets/categoryImages/${activity?.category}.jpg`}
         wrapped
@@ -47,7 +55,8 @@ const ActivityDetails: React.FC = () => {
             basic
             color="grey"
             content="Close"
-            onClick={() => detailsFormClose()}
+            as={Link}
+            to="/activities"
           />
         </Button.Group>
       </Card.Content>
