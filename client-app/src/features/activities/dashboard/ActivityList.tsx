@@ -14,7 +14,14 @@ const ActivityList: React.FC = () => {
     activityDelete,
   } = activityStore;
   if (!activities.length) {
-    return <p>Oh no! ...there are no activities to show. 😢</p>;
+    return (
+      <p>
+        Oh no! ...there are no activities to show.{" "}
+        <span role="img" aria-label="crying emoji">
+          😢
+        </span>
+      </p>
+    );
   } else {
     return (
       <Segment clearing>

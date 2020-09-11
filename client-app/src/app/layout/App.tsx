@@ -5,12 +5,12 @@ import ActivityDashboard from "../../features/activities/dashboard/ActivityDashb
 import LoadingComponent from "./LoadingComponent";
 import ActivityStore from "../stores/activityStore";
 import { observer } from "mobx-react-lite";
-import { Route } from "react-router-dom";
+import { Route, withRouter, RouteComponentProps } from "react-router-dom";
 import Home from "../../features/home/Home";
 import ActivityForm from "../../features/activities/form/ActivityForm";
 import ActivityDetails from "../../features/activities/details/ActivityDetails";
 
-const App = () => {
+const App: React.FC<RouteComponentProps> = ({ location }) => {
   const activityStore = useContext(ActivityStore);
 
   useEffect(() => {
@@ -18,20 +18,29 @@ const App = () => {
   }, [activityStore]);
 
   if (activityStore.activitiesLoading)
-    return (
-      <LoadingComponent inverted={true} content="Fetching activities ..." />
-    );
+    return <LoadingComponent inverted={true} content="Just a sec ..." />;
   return (
     <Fragment>
-      <NavBar />
-      <Container style={{ marginTop: "7em" }}>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/activities" component={ActivityDashboard} />
-        <Route path="/activities/:id" component={ActivityDetails} />
-        <Route path="/createActivity" component={ActivityForm} />
-      </Container>
+      <Route exact path="/" component={Home} />
+      <Route
+        path={"/(.+)"}
+        render={() => (
+          <Fragment>
+            <NavBar />
+            <Container style={{ marginTop: "7em" }}>
+              <Route exact path="/activities" component={ActivityDashboard} />
+              <Route path="/activities/:id" component={ActivityDetails} />
+              <Route
+                key={location.key}
+                path={["/createActivity", "/manage/:id"]}
+                component={ActivityForm}
+              />
+            </Container>
+          </Fragment>
+        )}
+      />
     </Fragment>
   );
 };
 
-export default observer(App);
+export default withRouter(observer(App));

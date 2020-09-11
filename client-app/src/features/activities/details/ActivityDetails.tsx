@@ -3,6 +3,7 @@ import { Card, Image, Button } from "semantic-ui-react";
 import ActivityStore from "../../../app/stores/activityStore";
 import { observer } from "mobx-react-lite";
 import { RouteComponentProps, Link } from "react-router-dom";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
 interface iDetailParams {
   id: string;
@@ -10,16 +11,20 @@ interface iDetailParams {
 
 const ActivityDetails: React.FC<RouteComponentProps<iDetailParams>> = ({
   match,
+  history,
 }) => {
   const activityStore = useContext(ActivityStore);
-  const { activity, activitySelect, editFormOpen } = activityStore;
+  const { activity, activitySelect, activitiesLoading } = activityStore;
 
   useEffect(() => {
     activitySelect(match.params.id);
-  }, [activitySelect]);
+  }, [activitySelect, match.params.id]);
+
+  if (activitiesLoading)
+    return <LoadingComponent content="Hang on, fetching activity..." />;
 
   return (
-    <Card>
+    <Card centered={true} raised={true}>
       <Image
         src={`/assets/categoryImages/${activity?.category}.jpg`}
         wrapped
@@ -49,14 +54,15 @@ const ActivityDetails: React.FC<RouteComponentProps<iDetailParams>> = ({
             basic
             color="blue"
             content="Edit"
-            onClick={() => editFormOpen(activity)}
+            as={Link}
+            to={`/manage/${activity?.id}`}
           />
           <Button
             basic
             color="grey"
             content="Close"
-            as={Link}
-            to="/activities"
+            onClick={() => history.push("/activities")}
+            // as={Link} to="/activities" // this also works
           />
         </Button.Group>
       </Card.Content>

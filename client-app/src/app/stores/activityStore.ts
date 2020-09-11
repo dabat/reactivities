@@ -66,7 +66,7 @@ class ActivityStore {
           throw new Error(`An activity with id ${id} was not found`);
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);  //for some reason this statement was throwing mobx state change errors
       } finally {
         runInAction(() => {
           this.activitiesLoading = false;
@@ -74,6 +74,10 @@ class ActivityStore {
         });
       }
     }
+  };
+
+  @action activityClear = async () => {
+    await this.activitySelect("");
   };
 
   @action activityUpdate = async (activity: IActivity) => {
