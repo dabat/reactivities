@@ -56,14 +56,6 @@ const ActivityForm: React.FC<RouteComponentProps<iFormParams>> = ({
           console.log(initialActivity);
           console.log(activity);
         });
-
-      // if (match.params.id) {
-      //   initialActivity && setActivity(initialActivity);
-      //   activitySelect(match.params.id).then(() => {
-      //     console.log(match.params.id);
-      //     console.log(initialActivity);
-      //     console.log(activity);
-      //   });
     }
     return () => {
       activityClear();
@@ -72,17 +64,17 @@ const ActivityForm: React.FC<RouteComponentProps<iFormParams>> = ({
     match.params.id,
     activity.id.length,
     activitySelect,
-    initialActivity,
+    // initialActivity,
     setActivity,
-    // activityClear,
-  ]); // having initialActivity in the dependency list throws the component into an infinite loop
+    activityClear,
+  ]);
 
   const handleInputChange = (
     event: FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.currentTarget;
     setActivity({ ...activity, [name]: value });
-    console.log("activity updated", activity);
+    // console.log("activity updated", activity);
   };
 
   const handleFormSubmit = () => {
@@ -98,7 +90,6 @@ const ActivityForm: React.FC<RouteComponentProps<iFormParams>> = ({
       activityUpdate(activity).then(() =>
         history.push(`/activities/${activity.id}`)
       );
-      // history.push(`/activities/${activity.id}`);
     }
   };
 

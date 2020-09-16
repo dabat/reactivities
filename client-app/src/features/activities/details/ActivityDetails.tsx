@@ -21,7 +21,12 @@ const ActivityDetails: React.FC<RouteComponentProps<iDetailParams>> = ({
   }, [activitySelect, match.params.id]);
 
   if (activitiesLoading)
-    return <LoadingComponent content="Hang on, fetching activity..." />;
+    return (
+      <LoadingComponent
+        inverted={true}
+        content="Hang on, fetching activity..."
+      />
+    );
 
   return (
     <Card centered={true} raised={true}>
