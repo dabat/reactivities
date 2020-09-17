@@ -13,8 +13,22 @@ class ActivityStore {
   @observable target = "";
 
   @computed get activitiesByDate() {
-    return Array.from(this.activityRegistry.values()).sort(
+    const activities = Array.from(this.activityRegistry.values());
+    return this.groupActivitiesByDate(activities);
+  }
+
+  groupActivitiesByDate(activities: IActivity[]) {
+    const activitiesSorted = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    );
+    return Object.entries(
+      activitiesSorted.reduce((activities, activity) => {
+        const date = activity.date.split("T")[0];
+        activities[date] = activities[date]
+          ? [...activities[date], activity]
+          : [activity];
+        return activities;
+      }, {} as { [key: string]: IActivity[] })
     );
   }
 
@@ -28,6 +42,7 @@ class ActivityStore {
           this.activityRegistry.set(activity.id, activity);
         });
       });
+      console.log(this.groupActivitiesByDate(activities));
     } catch (error) {
       console.log(error); //TODO log errors somewhere
     } finally {
